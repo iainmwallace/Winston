@@ -284,6 +284,71 @@
             font-size: 0.9em;
         }
 
+        .location-btn {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+            margin-top: 10px;
+        }
+
+        .location-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .location-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .calendar-btn {
+            padding: 8px 16px;
+            background: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .calendar-btn:hover {
+            background: #5a3678;
+            transform: translateY(-2px);
+        }
+
+        .day-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .distance-info {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .distance-info.visible {
+            display: block;
+        }
+
         footer {
             background: white;
             padding: 20px;
@@ -359,6 +424,8 @@
                 </div>
             </div>
             <div id="map"></div>
+            <button class="location-btn" id="locationBtn" onclick="findMyLocation()">📍 Where Am I?</button>
+            <div id="distanceInfo" class="distance-info"></div>
         </div>
 
         <!-- Day 1 -->
@@ -366,6 +433,9 @@
             <div class="day-header">
                 <h2>Day 1</h2>
                 <p class="day-theme">Discovery & History</p>
+                <div class="day-actions">
+                    <button class="calendar-btn" onclick="downloadDayCalendar(1)">📅 Add Day 1 to Calendar</button>
+                </div>
             </div>
 
             <div class="activity-card" onclick="toggleActivity(this)">
@@ -470,6 +540,9 @@
             <div class="day-header">
                 <h2>Day 2</h2>
                 <p class="day-theme">Outdoor Adventure & Play</p>
+                <div class="day-actions">
+                    <button class="calendar-btn" onclick="downloadDayCalendar(2)">📅 Add Day 2 to Calendar</button>
+                </div>
             </div>
 
             <div class="activity-card" onclick="toggleActivity(this)">
@@ -562,6 +635,9 @@
             <div class="day-header">
                 <h2>Day 3</h2>
                 <p class="day-theme">Science & Nature Finale</p>
+                <div class="day-actions">
+                    <button class="calendar-btn" onclick="downloadDayCalendar(3)">📅 Add Day 3 to Calendar</button>
+                </div>
             </div>
 
             <div class="activity-card" onclick="toggleActivity(this)">
@@ -663,31 +739,60 @@
     </div>
 
     <script>
-        // Activity locations data
+        // Activity locations data with full details
         const locations = [
             // Day 1
-            { day: 1, name: 'Kaleideum Downtown', lat: 36.0903, lng: -80.2439, color: '#FF6B6B',
-              desc: '🎨 Children\'s museum', time: '9:00 AM - 12:00 PM' },
-            { day: 1, name: 'Mellow Mushroom', lat: 36.0902, lng: -80.2445, color: '#FF6B6B',
-              desc: '🍕 Lunch', time: '12:30 PM - 1:30 PM' },
-            { day: 1, name: 'Historic Old Salem', lat: 36.0847, lng: -80.2458, color: '#FF6B6B',
-              desc: '🏛️ Living history museum', time: '2:00 PM - 4:30 PM' },
+            {
+                day: 1, name: 'Kaleideum Downtown', lat: 36.0903, lng: -80.2439, color: '#FF6B6B',
+                desc: '🎨 Children\'s museum', time: '9:00 AM - 12:00 PM',
+                address: '390 S Liberty St, Winston-Salem, NC 27101',
+                startTime: '09:00', endTime: '12:00'
+            },
+            {
+                day: 1, name: 'Mellow Mushroom', lat: 36.0902, lng: -80.2445, color: '#FF6B6B',
+                desc: '🍕 Lunch', time: '12:30 PM - 1:30 PM',
+                address: '345 S Liberty St, Winston-Salem, NC 27101',
+                startTime: '12:30', endTime: '13:30'
+            },
+            {
+                day: 1, name: 'Historic Old Salem', lat: 36.0847, lng: -80.2458, color: '#FF6B6B',
+                desc: '🏛️ Living history museum', time: '2:00 PM - 4:30 PM',
+                address: '900 Old Salem Rd, Winston-Salem, NC 27101',
+                startTime: '14:00', endTime: '16:30'
+            },
 
             // Day 2
-            { day: 2, name: 'Tanglewood Park', lat: 36.0169, lng: -80.3572, color: '#4ECDC4',
-              desc: '🌳 Park & playground', time: '9:00 AM - 12:30 PM' },
-            { day: 2, name: 'Kaleideum North', lat: 36.1359, lng: -80.2876, color: '#4ECDC4',
-              desc: '🎭 Environmental park & museum', time: '2:30 PM - 5:00 PM' },
+            {
+                day: 2, name: 'Tanglewood Park', lat: 36.0169, lng: -80.3572, color: '#4ECDC4',
+                desc: '🌳 Park & playground', time: '9:00 AM - 12:30 PM',
+                address: '4061 Clemmons Rd, Clemmons, NC 27012',
+                startTime: '09:00', endTime: '12:30'
+            },
+            {
+                day: 2, name: 'Kaleideum North', lat: 36.1359, lng: -80.2876, color: '#4ECDC4',
+                desc: '🎭 Environmental park & museum', time: '2:30 PM - 5:00 PM',
+                address: '400 W Hanes Mill Rd, Winston-Salem, NC 27105',
+                startTime: '14:30', endTime: '17:00'
+            },
 
             // Day 3
-            { day: 3, name: 'SciWorks', lat: 36.1359, lng: -80.2876, color: '#95E1D3',
-              desc: '🔬 Science center', time: '9:30 AM - 12:30 PM' },
-            { day: 3, name: 'Reynolda Gardens', lat: 36.1078, lng: -80.2838, color: '#95E1D3',
-              desc: '🌺 Gardens & village', time: '2:30 PM - 4:30 PM' }
+            {
+                day: 3, name: 'SciWorks', lat: 36.1359, lng: -80.2876, color: '#95E1D3',
+                desc: '🔬 Science center', time: '9:30 AM - 12:30 PM',
+                address: '400 W Hanes Mill Rd, Winston-Salem, NC 27105',
+                startTime: '09:30', endTime: '12:30'
+            },
+            {
+                day: 3, name: 'Reynolda Gardens', lat: 36.1078, lng: -80.2838, color: '#95E1D3',
+                desc: '🌺 Gardens & village', time: '2:30 PM - 4:30 PM',
+                address: '100 Reynolda Village, Winston-Salem, NC 27106',
+                startTime: '14:30', endTime: '16:30'
+            }
         ];
 
         let map;
         let markers = [];
+        let userMarker = null;
 
         // Initialize map
         function initMap() {
@@ -804,6 +909,155 @@
                 }
             });
         });
+
+        // Geolocation functionality
+        function findMyLocation() {
+            const btn = document.getElementById('locationBtn');
+            const distanceDiv = document.getElementById('distanceInfo');
+
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '🔍 Finding you...';
+            distanceDiv.classList.remove('visible');
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+
+                    // Add or update user marker
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+
+                    userMarker = L.marker([userLat, userLng], {
+                        icon: L.divIcon({
+                            html: '<div style="background: #28a745; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>',
+                            className: '',
+                            iconSize: [20, 20]
+                        })
+                    }).addTo(map);
+
+                    userMarker.bindPopup('<strong>You are here!</strong>').openPopup();
+
+                    // Pan map to user location
+                    map.setView([userLat, userLng], 13);
+
+                    // Calculate distances to all locations
+                    const distances = locations.map(loc => {
+                        const dist = calculateDistance(userLat, userLng, loc.lat, loc.lng);
+                        return { name: loc.name, distance: dist, day: loc.day };
+                    });
+
+                    // Find nearest location
+                    distances.sort((a, b) => a.distance - b.distance);
+                    const nearest = distances[0];
+
+                    // Display distance info
+                    let html = `<strong>📍 Your Location Found!</strong><br>`;
+                    html += `Nearest activity: <strong>${nearest.name}</strong> (${nearest.distance.toFixed(1)} miles away, Day ${nearest.day})`;
+
+                    distanceDiv.innerHTML = html;
+                    distanceDiv.classList.add('visible');
+
+                    btn.disabled = false;
+                    btn.textContent = '📍 Where Am I?';
+                },
+                (error) => {
+                    let message = 'Unable to find your location. ';
+                    if (error.code === 1) {
+                        message += 'Please enable location permissions.';
+                    } else if (error.code === 2) {
+                        message += 'Location unavailable.';
+                    } else {
+                        message += 'Request timeout.';
+                    }
+                    alert(message);
+                    btn.disabled = false;
+                    btn.textContent = '📍 Where Am I?';
+                }
+            );
+        }
+
+        // Calculate distance between two points (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 3959; // Earth's radius in miles
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                     Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Calendar export functionality
+        function downloadDayCalendar(dayNum) {
+            // Get activities for the specified day
+            const dayActivities = locations.filter(loc => loc.day === dayNum);
+
+            // Prompt user for date
+            const dateStr = prompt(
+                `Enter the date for Day ${dayNum} (YYYY-MM-DD format):\n\nExample: 2025-07-15`,
+                new Date(Date.now() + (dayNum * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]
+            );
+
+            if (!dateStr) return;
+
+            // Validate date format
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(dateStr)) {
+                alert('Invalid date format. Please use YYYY-MM-DD');
+                return;
+            }
+
+            // Generate iCalendar file
+            let icsContent = 'BEGIN:VCALENDAR\r\n';
+            icsContent += 'VERSION:2.0\r\n';
+            icsContent += 'PRODID:-//Winston-Salem Family Adventure//EN\r\n';
+            icsContent += 'CALSCALE:GREGORIAN\r\n';
+            icsContent += 'METHOD:PUBLISH\r\n';
+            icsContent += 'X-WR-CALNAME:Winston-Salem Family Adventure - Day ' + dayNum + '\r\n';
+            icsContent += 'X-WR-TIMEZONE:America/New_York\r\n';
+
+            dayActivities.forEach(activity => {
+                const datePrefix = dateStr.replace(/-/g, '');
+                const startDateTime = datePrefix + 'T' + activity.startTime.replace(':', '') + '00';
+                const endDateTime = datePrefix + 'T' + activity.endTime.replace(':', '') + '00';
+
+                icsContent += 'BEGIN:VEVENT\r\n';
+                icsContent += 'UID:' + Date.now() + '-' + Math.random() + '@winston-salem-adventure\r\n';
+                icsContent += 'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z\r\n';
+                icsContent += 'DTSTART:' + startDateTime + '\r\n';
+                icsContent += 'DTEND:' + endDateTime + '\r\n';
+                icsContent += 'SUMMARY:' + activity.name + '\r\n';
+                icsContent += 'DESCRIPTION:' + activity.desc.replace(/🎨|🍕|🏛️|🌳|🎭|🔬|🌺/g, '') + '\\n\\nTime: ' + activity.time + '\r\n';
+                icsContent += 'LOCATION:' + activity.address + '\r\n';
+                icsContent += 'STATUS:CONFIRMED\r\n';
+                icsContent += 'SEQUENCE:0\r\n';
+                icsContent += 'END:VEVENT\r\n';
+            });
+
+            icsContent += 'END:VCALENDAR\r\n';
+
+            // Create and download file
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'winston-salem-day-' + dayNum + '.ics';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Show success message
+            setTimeout(() => {
+                alert('Calendar file downloaded! Open it to add Day ' + dayNum + ' activities to your calendar app.');
+            }, 100);
+        }
 
         // Initialize map when page loads
         window.addEventListener('load', initMap);
