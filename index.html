@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winston-Salem Family Adventure - 3 Day Itinerary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .day-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .day-tab {
+            background: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .day-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .day-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .day-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .day-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .day-header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .day-header h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .day-theme {
+            color: #764ba2;
+            font-size: 1.3em;
+            font-style: italic;
+        }
+
+        .activity-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .activity-time {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .activity-title {
+            color: #333;
+            font-size: 1.5em;
+            font-weight: bold;
+            flex-grow: 1;
+            margin-left: 15px;
+        }
+
+        .expand-icon {
+            font-size: 1.5em;
+            color: #764ba2;
+            transition: transform 0.3s ease;
+        }
+
+        .activity-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .activity-description {
+            color: #666;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        .activity-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .activity-card.expanded .activity-details {
+            display: block;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .detail-icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .tips-section {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .tips-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .tips-content {
+            color: #856404;
+            font-size: 0.95em;
+        }
+
+        footer {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .day-tab {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+
+            .activity-header {
+                flex-direction: column;
+                align-items: start;
+            }
+
+            .activity-title {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎉 Winston-Salem Family Adventure</h1>
+            <p class="subtitle">3-Day Itinerary for Kids Ages 4 & 7</p>
+        </header>
+
+        <div class="day-tabs">
+            <button class="day-tab active" onclick="showDay(1)">Day 1</button>
+            <button class="day-tab" onclick="showDay(2)">Day 2</button>
+            <button class="day-tab" onclick="showDay(3)">Day 3</button>
+        </div>
+
+        <!-- Day 1 -->
+        <div id="day1" class="day-content active">
+            <div class="day-header">
+                <h2>Day 1</h2>
+                <p class="day-theme">Discovery & History</p>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">9:00 AM - 12:00 PM</span>
+                    <h3 class="activity-title">🎨 Kaleideum Downtown</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Start your adventure at this amazing children's museum with interactive exhibits perfect for young explorers!</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">📍</span>
+                        <span>390 S Liberty St, Winston-Salem, NC 27101</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🎯</span>
+                        <span>Highlights: The Edible Garden, Make It Studio, and Far Out! planetarium show</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">💡</span>
+                        <span>Kids can build, create, and explore hands-on science exhibits at their own pace</span>
+                    </div>
+                    <div class="tips-section">
+                        <div class="tips-title">💡 Parent Tip:</div>
+                        <div class="tips-content">Arrive right when it opens to avoid crowds. Don't miss the sensory-friendly exhibits on the second floor!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">12:30 PM - 1:30 PM</span>
+                    <h3 class="activity-title">🍕 Lunch at Mellow Mushroom</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Fun, family-friendly pizza restaurant with a creative atmosphere kids will love!</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">📍</span>
+                        <span>345 S Liberty St, Winston-Salem (walking distance!)</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🍴</span>
+                        <span>Kid favorites: Cheese pizza, pretzel bites, and fun drink options</span>
+                    </div>
+                    <div class="tips-section">
+                        <div class="tips-title">💡 Parent Tip:</div>
+                        <div class="tips-content">They have coloring sheets to keep kids entertained while waiting for food.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">2:00 PM - 4:30 PM</span>
+                    <h3 class="activity-title">🏛️ Historic Old Salem</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Step back in time and explore this living history museum with costumed interpreters and historic buildings.</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">📍</span>
+                        <span>900 Old Salem Rd, Winston-Salem, NC 27101</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🎯</span>
+                        <span>Must-see: Winkler Bakery (fresh cookies!), T. Bagge Merchant, and toy museum</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🎪</span>
+                        <span>Kids can try on period clothing, play old-fashioned games, and see craftspeople at work</span>
+                    </div>
+                    <div class="tips-section">
+                        <div class="tips-title">💡 Parent Tip:</div>
+                        <div class="tips-content">Buy Moravian cookies at the bakery - they're amazing! The toy museum is especially engaging for the 7-year-old.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">5:00 PM - 6:30 PM</span>
+                    <h3 class="activity-title">🍔 Dinner & Ice Cream</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Casual dinner followed by sweet treats at local favorite ice cream shop.</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">🍴</span>
+                        <span>Dinner option: Sweet Potatoes (Southern comfort food with kids menu)</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🍦</span>
+                        <span>Dessert: Walk to Footnotes Handcrafted Ice Cream nearby</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Day 2 -->
+        <div id="day2" class="day-content">
+            <div class="day-header">
+                <h2>Day 2</h2>
+                <p class="day-theme">Outdoor Adventure & Play</p>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">9:00 AM - 12:30 PM</span>
+                    <h3 class="activity-title">🌳 Tanglewood Park</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Massive park with playgrounds, trails, and tons of space for kids to run and explore!</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">📍</span>
+                        <span>4061 Clemmons Rd, Clemmons, NC 27012 (15 min drive)</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🎯</span>
+                        <span>Activities: Playground, pedal boats (seasonal), easy walking trails, deer park</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🦌</span>
+                        <span>Visit the petting farm where kids can see goats, chickens, and other friendly animals</span>
+                    </div>
+                    <div class="tips-section">
+                        <div class="tips-title">💡 Parent Tip:</div>
+                        <div class="tips-content">Bring a picnic blanket and snacks. The playground is top-notch with equipment for both age groups. Pack bug spray in warmer months!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">12:30 PM - 1:30 PM</span>
+                    <h3 class="activity-title">🌮 Lunch at Village Tavern</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Family-friendly restaurant with diverse menu options for picky and adventurous eaters alike.</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">🍴</span>
+                        <span>Great kids menu including chicken tenders, mac & cheese, and sliders</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">2:30 PM - 5:00 PM</span>
+                    <h3 class="activity-title">🎭 Kaleideum North</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Environmental park and museum with nature trails, live animals, and outdoor exhibits.</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">📍</span>
+                        <span>400 W Hanes Mill Rd, Winston-Salem, NC 27105</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🎯</span>
+                        <span>Highlights: Planetarium shows, live animal exhibits, Explore Outdoors trail</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🐍</span>
+                        <span>See snakes, turtles, owls, and other native North Carolina animals up close</span>
+                    </div>
+                    <div class="tips-section">
+                        <div class="tips-title">💡 Parent Tip:</div>
+                        <div class="tips-content">Check planetarium show times in advance. The outdoor trails are stroller-friendly and perfect for burning off energy!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">6:00 PM - 7:00 PM</span>
+                    <h3 class="activity-title">🍝 Dinner at Crafted</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Casual American dining with a welcoming atmosphere for families.</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">🍴</span>
+                        <span>Popular items: Burgers, pizzas, and pasta that kids love</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Day 3 -->
+        <div id="day3" class="day-content">
+            <div class="day-header">
+                <h2>Day 3</h2>
+                <p class="day-theme">Science & Nature Finale</p>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">9:30 AM - 12:30 PM</span>
+                    <h3 class="activity-title">🔬 SciWorks</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Hands-on science center and environmental park - perfect finale to your Winston-Salem adventure!</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">📍</span>
+                        <span>400 W Hanes Mill Rd, Winston-Salem, NC 27105</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🎯</span>
+                        <span>Must-do: BioWorks (touch sea stars!), physics exhibits, outdoor nature trails</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🧪</span>
+                        <span>Interactive exhibits about sound, light, health, and animals that kids can touch and explore</span>
+                    </div>
+                    <div class="tips-section">
+                        <div class="tips-title">💡 Parent Tip:</div>
+                        <div class="tips-content">The 4-year-old will love the water play area (bring a change of clothes!). Check for live science demonstration times.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">1:00 PM - 2:00 PM</span>
+                    <h3 class="activity-title">🥪 Lunch at Panera Bread</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Quick, healthy lunch option with kid-friendly choices.</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">🍴</span>
+                        <span>Kids menu: Mac & cheese, grilled cheese, PB&J, and more</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">2:30 PM - 4:30 PM</span>
+                    <h3 class="activity-title">🌺 Reynolda Gardens & Village</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">Beautiful gardens with wide paths perfect for exploring, plus charming village shops.</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">📍</span>
+                        <span>100 Reynolda Village, Winston-Salem, NC 27106</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🎯</span>
+                        <span>Highlights: Formal gardens, greenhouse, wide walking paths, koi pond</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🦆</span>
+                        <span>Kids love looking for turtles and fish in the ponds. Plenty of space to run!</span>
+                    </div>
+                    <div class="tips-section">
+                        <div class="tips-title">💡 Parent Tip:</div>
+                        <div class="tips-content">Free admission! Great for wearing out the kids before the drive home. Visit the Reynolda Village shops for unique souvenirs.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-card" onclick="toggleActivity(this)">
+                <div class="activity-header">
+                    <span class="activity-time">5:00 PM - 6:00 PM</span>
+                    <h3 class="activity-title">🍦 Farewell Ice Cream</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <p class="activity-description">End your Winston-Salem adventure with a sweet treat!</p>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">🍨</span>
+                        <span>Try Yum Yum Better Ice Cream or Ben & Jerry's at Reynolda Village</span>
+                    </div>
+                    <div class="tips-section">
+                        <div class="tips-title">💡 Parent Tip:</div>
+                        <div class="tips-content">Perfect way to celebrate three amazing days of family fun!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Helpful Tips for Your Trip:</strong></p>
+            <p>🌤️ Check weather forecasts and dress in layers | 💧 Bring refillable water bottles |
+            📱 Download activity apps ahead of time | 🎒 Pack snacks for hangry moments |
+            ⏰ Build in buffer time between activities for bathroom breaks and meltdowns</p>
+            <p style="margin-top: 15px; font-style: italic;">Have an amazing family adventure in Winston-Salem! 🎉</p>
+        </footer>
+    </div>
+
+    <script>
+        function showDay(dayNumber) {
+            // Hide all day contents
+            const allDays = document.querySelectorAll('.day-content');
+            allDays.forEach(day => day.classList.remove('active'));
+
+            // Remove active class from all tabs
+            const allTabs = document.querySelectorAll('.day-tab');
+            allTabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected day
+            document.getElementById('day' + dayNumber).classList.add('active');
+
+            // Highlight active tab
+            event.target.classList.add('active');
+
+            // Scroll to top of content
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleActivity(card) {
+            card.classList.toggle('expanded');
+        }
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const currentDay = document.querySelector('.day-content.active');
+            const currentDayNum = parseInt(currentDay.id.replace('day', ''));
+
+            if (e.key === 'ArrowRight' && currentDayNum < 3) {
+                const nextTab = document.querySelectorAll('.day-tab')[currentDayNum];
+                nextTab.click();
+            } else if (e.key === 'ArrowLeft' && currentDayNum > 1) {
+                const prevTab = document.querySelectorAll('.day-tab')[currentDayNum - 2];
+                prevTab.click();
+            }
+        });
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
