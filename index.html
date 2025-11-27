@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Winston-Salem Family Adventure - 3 Day Itinerary</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * {
             margin: 0;
@@ -211,6 +213,77 @@
             font-size: 0.95em;
         }
 
+        .map-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+        }
+
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .map-title {
+            color: #667eea;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .map-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        #map {
+            height: 500px;
+            border-radius: 10px;
+            z-index: 1;
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 10px;
+        }
+
+        .popup-content h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .popup-content p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
         footer {
             background: white;
             padding: 20px;
@@ -240,6 +313,24 @@
                 margin-left: 0;
                 margin-top: 10px;
             }
+
+            #map {
+                height: 350px;
+            }
+
+            .map-header {
+                flex-direction: column;
+                align-items: start;
+            }
+
+            .map-filters {
+                width: 100%;
+            }
+
+            .filter-btn {
+                flex: 1;
+                min-width: fit-content;
+            }
         }
     </style>
 </head>
@@ -254,6 +345,20 @@
             <button class="day-tab active" onclick="showDay(1)">Day 1</button>
             <button class="day-tab" onclick="showDay(2)">Day 2</button>
             <button class="day-tab" onclick="showDay(3)">Day 3</button>
+        </div>
+
+        <!-- Interactive Map -->
+        <div class="map-container">
+            <div class="map-header">
+                <h3 class="map-title">📍 Activity Locations</h3>
+                <div class="map-filters">
+                    <button class="filter-btn active" onclick="filterMap('all')">All Days</button>
+                    <button class="filter-btn" onclick="filterMap(1)">Day 1</button>
+                    <button class="filter-btn" onclick="filterMap(2)">Day 2</button>
+                    <button class="filter-btn" onclick="filterMap(3)">Day 3</button>
+                </div>
+            </div>
+            <div id="map"></div>
         </div>
 
         <!-- Day 1 -->
@@ -558,6 +663,100 @@
     </div>
 
     <script>
+        // Activity locations data
+        const locations = [
+            // Day 1
+            { day: 1, name: 'Kaleideum Downtown', lat: 36.0903, lng: -80.2439, color: '#FF6B6B',
+              desc: '🎨 Children\'s museum', time: '9:00 AM - 12:00 PM' },
+            { day: 1, name: 'Mellow Mushroom', lat: 36.0902, lng: -80.2445, color: '#FF6B6B',
+              desc: '🍕 Lunch', time: '12:30 PM - 1:30 PM' },
+            { day: 1, name: 'Historic Old Salem', lat: 36.0847, lng: -80.2458, color: '#FF6B6B',
+              desc: '🏛️ Living history museum', time: '2:00 PM - 4:30 PM' },
+
+            // Day 2
+            { day: 2, name: 'Tanglewood Park', lat: 36.0169, lng: -80.3572, color: '#4ECDC4',
+              desc: '🌳 Park & playground', time: '9:00 AM - 12:30 PM' },
+            { day: 2, name: 'Kaleideum North', lat: 36.1359, lng: -80.2876, color: '#4ECDC4',
+              desc: '🎭 Environmental park & museum', time: '2:30 PM - 5:00 PM' },
+
+            // Day 3
+            { day: 3, name: 'SciWorks', lat: 36.1359, lng: -80.2876, color: '#95E1D3',
+              desc: '🔬 Science center', time: '9:30 AM - 12:30 PM' },
+            { day: 3, name: 'Reynolda Gardens', lat: 36.1078, lng: -80.2838, color: '#95E1D3',
+              desc: '🌺 Gardens & village', time: '2:30 PM - 4:30 PM' }
+        ];
+
+        let map;
+        let markers = [];
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([36.0999, -80.2442], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Add all markers
+            locations.forEach(loc => {
+                const marker = L.circleMarker([loc.lat, loc.lng], {
+                    radius: 10,
+                    fillColor: loc.color,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map);
+
+                const popupContent = `
+                    <div class="popup-content">
+                        <h4>${loc.name}</h4>
+                        <p><strong>Day ${loc.day}</strong></p>
+                        <p>${loc.desc}</p>
+                        <p><em>${loc.time}</em></p>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+                marker.day = loc.day;
+                markers.push(marker);
+            });
+
+            // Add legend
+            const legend = L.control({ position: 'bottomright' });
+            legend.onAdd = function(map) {
+                const div = L.DomUtil.create('div', 'info legend');
+                div.innerHTML = `
+                    <div style="background: white; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        <div style="margin-bottom: 5px;"><span style="display: inline-block; width: 12px; height: 12px; background: #FF6B6B; border-radius: 50%; margin-right: 5px;"></span> Day 1</div>
+                        <div style="margin-bottom: 5px;"><span style="display: inline-block; width: 12px; height: 12px; background: #4ECDC4; border-radius: 50%; margin-right: 5px;"></span> Day 2</div>
+                        <div><span style="display: inline-block; width: 12px; height: 12px; background: #95E1D3; border-radius: 50%; margin-right: 5px;"></span> Day 3</div>
+                    </div>
+                `;
+                return div;
+            };
+            legend.addTo(map);
+        }
+
+        // Filter map by day
+        function filterMap(dayFilter) {
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show/hide markers
+            markers.forEach(marker => {
+                if (dayFilter === 'all' || marker.day === dayFilter) {
+                    marker.setStyle({ fillOpacity: 0.8, opacity: 1 });
+                } else {
+                    marker.setStyle({ fillOpacity: 0.1, opacity: 0.3 });
+                }
+            });
+        }
+
         function showDay(dayNumber) {
             // Hide all day contents
             const allDays = document.querySelectorAll('.day-content');
@@ -605,6 +804,9 @@
                 }
             });
         });
+
+        // Initialize map when page loads
+        window.addEventListener('load', initMap);
     </script>
 </body>
 </html>
